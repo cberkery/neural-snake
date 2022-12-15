@@ -1,0 +1,19 @@
+[tool.black]
+line-length = 120
+experimental-string-processing = true
+
+[tool.poetry]
+name = "neural-snake"
+version = "0.1.0"
+description = "Evolve neural networks to beat the game snake at arbitrary game sizes."
+authors = ["Cormac Berkery <cormac.berkery@source.ag>"]
+readme = "README.md"
+packages = [{include = "neural_snake"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
