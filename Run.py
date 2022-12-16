@@ -1,17 +1,20 @@
 import numpy as np
-from Evolution_population import population
 
+from CLargs import CLargs
+from Population import Population
 from Snake import Snake
+
+population_size, iterations, mutation_rate, selection_proportion = CLargs().return_args()
 
 
 def run(iterations):
 
-    pop = population(
-        population_size=100,
-        iterations=10,
-        mutation_rate=0.01,
+    pop = Population(
+        population_size=population_size,
+        iterations=iterations,
+        mutation_rate=mutation_rate,
         tournament_type="round-robin",
-        selection_proportion=0.01,
+        selection_proportion=selection_proportion,
         keep_best=True,
     )
     pop.initialise_population()
@@ -30,4 +33,4 @@ def run(iterations):
     return pop
 
 
-run(iterations=200)
+run(iterations=iterations)

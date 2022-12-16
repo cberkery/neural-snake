@@ -5,7 +5,7 @@ import numpy as np
 from Snake import Snake
 
 
-class Evolution_population(Snake):
+class Evolution(Snake):
     def __init__(
         self,
         population_size: int,
@@ -198,24 +198,6 @@ class Evolution_population(Snake):
 
         return new_snake
 
-    # def generation(self):
-    #     new_population = []
-    #     for i in range(self.population_size):
-    #         parent_1_idx = i % self.holdout
-    #         if self.mating:
-    #             parent_2_idx = min(
-    #                 self.population_size - 1, int(np.random.exponential(self.holdout))
-    #             )
-    #         else:
-    #             parent_2_idx = parent_1_idx
-    #         offspring = self.population[parent_1_idx].mate(
-    #             self.population[parent_2_idx]
-    #         )
-    #         new_population.append(offspring)
-    #     if keep_best:
-    #         new_population[-1] = self.population[0]  # Ensure best organism survives
-    #     self.population = new_population
-
     def select(self):
         pass
 
@@ -226,12 +208,4 @@ class Evolution_population(Snake):
         assert self.population == self.population_size
 
     def return_next_generation(self):
-        pass
-
-
-class Evolution(population):
-    def __init__(self, population_size: int, mutation_rate: float, tournament_type: str):
-        super().__init__(fname, lname)
-
-    def run(self):
         pass
