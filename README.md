@@ -20,14 +20,9 @@ SelectionProportion = 0.01
 Like the one you played on some relative's Nokia in the backseat of a car.
 
 
-
 # Module structure (Is definitely a WIP)
 The base class is Snake_computation which handles initialisation and propogation of the neural network. In addition there are methods for 
 converting the game state into the network input.
-
-
-# Key areas for improvement and experimentation
-
 
 
 # How to have fun
