@@ -1,5 +1,6 @@
-from Snake_computation import Snake_computation
 import numpy as np
+
+from Snake_computation import Snake_computation
 
 
 class Snake_game(Snake_computation):
@@ -55,7 +56,7 @@ class Snake_game(Snake_computation):
 
             if self.move_counter > 800:
                 self.game_over = True
-                #print("Game went on for too many iterations")
+                # print("Game went on for too many iterations")
 
             if self.is_final_snake is True:
                 if self.game_over is False:

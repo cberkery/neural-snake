@@ -1,6 +1,7 @@
-from Snake import Snake
-from Evolution import population
 import numpy as np
+from Evolution_population import population
+
+from Snake import Snake
 
 
 def run(iterations):
@@ -24,7 +25,7 @@ def run(iterations):
     best_snake.is_final_snake = True
     best_snake.display_freq = 1
     best_snake.gameLoop()
-    print('Final snake score on last run', best_snake.Length_of_snake)
+    print("Final snake score on last run", best_snake.Length_of_snake)
 
     return pop
 

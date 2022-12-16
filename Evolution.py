@@ -1,9 +1,11 @@
-from Snake import Snake
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
 
-class population(Snake):
+from Snake import Snake
+
+
+class Evolution_population(Snake):
     def __init__(
         self,
         population_size: int,
@@ -43,7 +45,7 @@ class population(Snake):
             )
             for i in range(self.population_size)
         ]
-        print('self.population_size', self.population_size)
+        print("self.population_size", self.population_size)
 
     def get_num_idx_to_mutate(self):
 
@@ -64,7 +66,7 @@ class population(Snake):
 
     def run_and_get_idx_of_best(self):
         self.population_scores = [snake.gameLoop() for snake in self.population]
-        #print('population scores', self.population_scores)
+        # print('population scores', self.population_scores)
         if len(np.argsort(np.array(self.population_scores))[::-1]) > 1:
             self.idx_of_best = np.argsort(np.array(self.population_scores))[::-1][
                 : int(self.selection_proportion * self.population_size)
@@ -79,8 +81,6 @@ class population(Snake):
                 # print('Unique moves', unique, 'Move frequencies: ', counts)
         else:
             self.idx_of_best = [i for i in range(10)]
-
-
 
     def create_new_population(self):
 
