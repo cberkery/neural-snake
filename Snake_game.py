@@ -3,15 +3,7 @@ import numpy as np
 
 
 class Snake_game(Snake_computation):
-    def __init__(
-        self,
-        game_size,
-        l1_size,
-        l2_size,
-        n_food,
-        input_type,
-        max_snake_coords_input_size,
-    ):
+    def __init__(self, game_size, l1_size, l2_size, n_food, input_type, max_snake_coords_input_size, output_size):
 
         super().__init__(
             game_size,
@@ -20,6 +12,7 @@ class Snake_game(Snake_computation):
             # n_food,
             input_type,
             max_snake_coords_input_size,
+            output_size,
         )
         # self.n_food = n_food
         self.game_size = game_size
@@ -55,7 +48,7 @@ class Snake_game(Snake_computation):
 
             if self.move_counter > 800:
                 self.game_over = True
-                #print("Game went on for too many iterations")
+                # print("Game went on for too many iterations")
 
             if self.is_final_snake is True:
                 if self.game_over is False:
@@ -64,7 +57,12 @@ class Snake_game(Snake_computation):
         return self.Length_of_snake
 
     def check_boundary_violation(self):
-        if self.x1 >= self.game_size or self.x1 <= 0 or self.y1 >= self.game_size or self.y1 <= 0:
+        if (
+            self.location[0] >= self.game_size
+            or self.location[0] <= 0
+            or self.location[1] >= self.game_size
+            or self.location[1] <= 0
+        ):
             # print("hit boundary")
             self.game_over = True
 
@@ -92,20 +90,16 @@ class Snake_game(Snake_computation):
         return x1_change, y1_change
 
     def create_food(self):
-        # remove found self.food
-        if self.n_food is None:
-            print("n_food swas somehow set to None")
-            self.n_food = 10
+        # # remove found self.food
+        # if self.n_food is None:
+        #     print("n_food swas somehow set to None")
+        #     self.n_food = 10
 
         if len(self.food) < self.n_food:
-            self.food[self.food != [self.x2, self.y1]].reshape(self.n_food - 1, 2)
-            self.food = np.concatenate(
-                np.random.randint(
-                    1,
-                    self.game_size - 1,
-                    size=int(np.abs(self.food - len(self.n_food), 2)),
-                )
-            )
+            for i in range(int(np.abs(self.n_food - len(self.food)))):
+                new_food = np.random.randint(1, self.game_size - 1, size=(1, 2))
+                self.food = np.vstack((self.food, np.random.randint(1, self.game_size - 1, size=2)))
+
         else:
             pass
 
