@@ -3,14 +3,7 @@ import numpy as np
 
 
 class Snake_computation(object):
-    def __init__(
-        self,
-        game_size,
-        l1_size,
-        l2_size,
-        input_type: str,
-        max_snake_coords_input_size,
-    ):
+    def __init__(self, game_size, l1_size, l2_size, input_type: str, max_snake_coords_input_size, output_size):
 
         self.game_size = game_size
         self.game_area_length = self.game_size * self.game_size
@@ -18,7 +11,7 @@ class Snake_computation(object):
 
         self.input_type = input_type
 
-        self.output_size = 5
+        self.output_size = output_size
 
         self.input_type = "simple"
 
@@ -86,9 +79,13 @@ class Snake_computation(object):
 
         # Get relevant_snake
         relevant_snake_list = self.snake_List.copy()[-self.max_snake_coords_input_size :]
-        relevant_snake_list = relevant_snake_list.reshape(
-            min(self.Length_of_snake, self.max_snake_coords_input_size), 2
-        )
+        try:
+            relevant_snake_list = relevant_snake_list.reshape(
+                min(self.Length_of_snake, self.max_snake_coords_input_size), 2
+            )
+        except ValueError:
+            print('Problem')
+            
         for i in range(np.abs(self.max_snake_coords_input_size - len(relevant_snake_list))):
             relevant_snake_list = np.insert(relevant_snake_list, 0, np.zeros(2), axis=0)
 

@@ -1,17 +1,19 @@
 from Snake import Snake
-from Evolution import population
+from Population import Population
 import numpy as np
 
 
 def run(iterations):
 
-    pop = population(
-        population_size=100,
+    pop = Population(
+        population_size=40,
         iterations=10,
         mutation_rate=0.01,
         tournament_type="round-robin",
-        selection_proportion=0.01,
+        selection_proportion=0.2,
         keep_best=True,
+        output_size=3,
+        max_move_cycle=5,
     )
     pop.initialise_population()
 
@@ -24,9 +26,9 @@ def run(iterations):
     best_snake.is_final_snake = True
     best_snake.display_freq = 1
     best_snake.gameLoop()
-    print('Final snake score on last run', best_snake.Length_of_snake)
+    print("Final snake score on last run", best_snake.Length_of_snake)
 
     return pop
 
 
-run(iterations=200)
+run(iterations=10)
