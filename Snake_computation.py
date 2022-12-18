@@ -25,13 +25,23 @@ class Snake_computation(object):
         self.W2 = np.random.uniform(low=-1, high=1.0, size=(self.l1_size, self.l2_size))
         self.W3 = np.random.uniform(low=-1, high=1.0, size=(self.output_size, self.l2_size))
 
+    def initialise_biases(self):
+        std = np.sqrt(2 / sum(shape))
+        shape = (dimensions[i], dimensions[i+1])
+        self.B1 = np.random.normal(0, std, (1,  dimensions[i+1])) 
+        self.B2 = np.random.normal(0, std, (1,  dimensions[i+1])) 
+        self.B3 = np.random.normal(0, std, (1,  dimensions[i+1])) 
+
+    def multiply_biases(self):
+        X = X @ layer + np.ones((X.shape[0], 1)) @ bias
+
     def set_weights(self, W1, W2, W3):
         # self.W1
         # self.W2
         # self.W3
         pass
 
-    @jit(forceobj=True)
+    #@jit(forceobj=True)
     def compute(self):
 
         A1 = self.input_vec
@@ -85,7 +95,7 @@ class Snake_computation(object):
             )
         except ValueError:
             print('Problem')
-            
+
         for i in range(np.abs(self.max_snake_coords_input_size - len(relevant_snake_list))):
             relevant_snake_list = np.insert(relevant_snake_list, 0, np.zeros(2), axis=0)
 
