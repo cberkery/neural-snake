@@ -118,8 +118,9 @@ class Snake(Snake_game):
             self.move_dist["right"] += 1
 
         # CONTINUE
-        elif self.move == 2:
-            self.move_dist["continue"] += 1
+        elif move == 4:
+            y1_change = self.last_move_y[-1]
+            x1_change = self.last_move_x[-1]
 
     @jit(forceobj=True)
     def right_rotation(self):

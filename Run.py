@@ -2,6 +2,7 @@ from Snake import Snake
 from Population import Population
 import numpy as np
 from Visualise import visualise
+from Visualise import visualise
 
 
 def run(iterations):
@@ -41,7 +42,7 @@ def run(iterations):
     visualise(best_snake.images)
     print("Final snake score on last run", best_snake.Length_of_snake)
 
-    return pop
+    #return pop
 
 
 run(iterations=1)
