@@ -160,6 +160,22 @@ class Snake(Snake_game):
 
         return np.array(clear)
 
+    def log_and_return_images(self):
+        if self.move_counter == 1:
+            self.images = []
+
+        display = np.zeros((self.game_size+1, self.game_size+1))
+        snake_arr = self.snake_List.copy()
+
+        for snack in self.food:
+            display[snack[0]][snack[1]] = "255"
+
+        # if len(snake_arr) > 1:
+        for coords in list(snake_arr):
+            display[coords[0]][coords[1]] = "100"
+
+        self.images.append(display)
+
     # def heuristics(self):
 
     #     clearness_thresh = 1 #

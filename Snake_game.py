@@ -58,6 +58,7 @@ class Snake_game(Snake_computation):
                 #print("Game went on for too many iterations")
 
             if self.is_final_snake is True:
+                self.log_and_return_images()
                 if self.game_over is False:
                     self.display()
 
