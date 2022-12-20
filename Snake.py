@@ -117,8 +117,9 @@ class Snake(Snake_game):
             self.move_dist["right"] += 1
 
         # CONTINUE
-        elif self.move == 2:
-            self.move_dist["continue"] += 1
+        elif move == 4:
+            y1_change = self.last_move_y[-1]
+            x1_change = self.last_move_x[-1]
 
     @jit(forceobj=True)
     def right_rotation(self):
@@ -201,6 +202,22 @@ class Snake(Snake_game):
             #print('Snake was choosing same move every time, changing from {} to {}'.format(self.move, chose_other_move))
 
             self.move = chose_other_move
+
+    def log_and_return_images(self):
+        if self.move_counter == 1:
+            self.images = []
+
+        display = np.zeros((self.game_size+1, self.game_size+1))
+        snake_arr = self.snake_List.copy()
+
+        for snack in self.food:
+            display[snack[0]][snack[1]] = "255"
+
+        # if len(snake_arr) > 1:
+        for coords in list(snake_arr):
+            display[coords[0]][coords[1]] = "100"
+
+        self.images.append(display)
 
     # def heuristics(self):
 
