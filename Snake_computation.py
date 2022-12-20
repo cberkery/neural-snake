@@ -3,54 +3,94 @@ import numpy as np
 
 
 class Snake_computation(object):
-    def __init__(self, game_size, l1_size, l2_size, input_type: str, max_snake_coords_input_size, output_size):
+    def __init__(
+        self, game_size, l1_size, l2_size, input_type: str, max_snake_coords_input_size, output_size, dimensions, use_bias=True, output="softmax"
+    ):
 
         self.game_size = game_size
         self.game_area_length = self.game_size * self.game_size
         self.area_repr = np.zeros(game_size * game_size)
 
         self.input_type = input_type
-
         self.output_size = output_size
-
-        self.input_type = "simple"
-
         self.max_snake_coords_input_size = max_snake_coords_input_size
-
         self.l1_size = l1_size
         self.l2_size = l2_size
 
+        self.use_bias = use_bias
+        self.network_dimensions = network_dimensions
+
+    def initialse_weights_and_biases(self):
+        """
+        Uses weight/bias initialisation heuristic from Glorot (http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf).
+        """
+        self.layers = []
+        self.biases = []
+        self.output = self._activation(output)
+        for i in range(len(self.dimensions) - 1):
+            shape = (dimensions[i], dimensions[i + 1])
+            std = np.sqrt(2 / sum(shape))
+            layer = np.random.normal(0, std, shape)
+            bias = np.random.normal(0, std, (1, dimensions[i + 1])) * self.use_bias
+            self.layers.append(layer)
+            self.biases.append(bias)
+
+    def _activation(self, output):
+        if output == "softmax":
+            return lambda X: np.exp(X) / np.sum(np.exp(X), axis=1).reshape(-1, 1)
+        if output == "sigmoid":
+            return lambda X: (1 / (1 + np.exp(-X)))
+        if output == "linear":
+            return lambda X: X
+
+    def predict(self, X):
+        if not X.ndim == 2:
+            raise ValueError(f"Input has {X.ndim} dimensions, expected 2")
+        if not X.shape[1] == self.layers[0].shape[0]:
+            raise ValueError(f"Input has {X.shape[1]} features, expected {self.layers[0].shape[0]}")
+        for index, (layer, bias) in enumerate(zip(self.layers, self.biases)):
+            X = X @ layer + np.ones((X.shape[0], 1)) @ bias
+            if index == len(self.layers) - 1:
+                X = self.output(X)  # output activation
+            else:
+                X = np.clip(X, 0, np.inf)  # ReLU
+        return X
+
     def initialise_weights(self):
-        self.W1 = np.random.uniform(low=-1, high=1.0, size=(self.l1_size, self.input_size))
-        self.W2 = np.random.uniform(low=-1, high=1.0, size=(self.l1_size, self.l2_size))
-        self.W3 = np.random.uniform(low=-1, high=1.0, size=(self.output_size, self.l2_size))
+        self.W1 = self.layers[0]
+        self.W2 = self.layers[1]
+        self.W3 = self.layers[2]
+
+    
+        # self.W1 = np.random.uniform(low=-1, high=1.0, size=(self.l1_size, self.input_size))
+        # self.W2 = np.random.uniform(low=-1, high=1.0, size=(self.l1_size, self.l2_size))
+        # self.W3 = np.random.uniform(low=-1, high=1.0, size=(self.output_size, self.l2_size))
 
     def initialise_biases(self):
-        std = np.sqrt(2 / sum(shape))
-        shape = (dimensions[i], dimensions[i+1])
-        self.B1 = np.random.normal(0, std, (1,  dimensions[i+1])) 
-        self.B2 = np.random.normal(0, std, (1,  dimensions[i+1])) 
-        self.B3 = np.random.normal(0, std, (1,  dimensions[i+1])) 
+        
+        self.B1 = 
+        self.B2 = 
+        self.B3 = 
 
-    def multiply_biases(self):
-        X = X @ layer + np.ones((X.shape[0], 1)) @ bias
+    # def multiply_biases(self):
+    #     X = X @ layer + np.ones((X.shape[0], 1)) @ bias
 
-    def set_weights(self, W1, W2, W3):
-        # self.W1
-        # self.W2
-        # self.W3
-        pass
+    # def set_weights(self, W1, W2, W3):
+    #     # self.W1
+    #     # self.W2
+    #     # self.W3
+    #     pass
 
-    #@jit(forceobj=True)
-    def compute(self):
+    # # @jit(forceobj=True)
+    # def compute(self):
 
-        A1 = self.input_vec
-        A2 = ReLU(np.dot(self.W1, A1))
-        A3 = ReLU(np.dot(self.W2, A2))
-        A3 = np.transpose(A3)
-        A4 = ReLU(np.dot(self.W3, A3))
+    #     A1 = self.input_vec
+    #     A2 = ReLU(np.dot(self.W1, A1))
+    #     A3 = ReLU(np.dot(self.W2, A2))
+    #     A3 = np.transpose(A3)
+    #     A4 = ReLU(np.dot(self.W3, A3))
 
-        return int(np.argmax(A4))
+    #     return int(np.argmax(A4))
 
     @jit(forceobj=True)
     def jit_convert2(self, rec_array=None):
@@ -94,7 +134,7 @@ class Snake_computation(object):
                 min(self.Length_of_snake, self.max_snake_coords_input_size), 2
             )
         except ValueError:
-            print('Problem')
+            print("Problem")
 
         for i in range(np.abs(self.max_snake_coords_input_size - len(relevant_snake_list))):
             relevant_snake_list = np.insert(relevant_snake_list, 0, np.zeros(2), axis=0)
@@ -137,6 +177,8 @@ class Snake_computation(object):
         elif self.input_type == "complex":
             self.input_size = len(self.area_repr) + 4  # Boundary distances
             self.get_vector = self.create_input_vector()
+
+        self.network_dimensions[0] = self.input_size
 
 
 # Activation functions

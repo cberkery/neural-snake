@@ -16,24 +16,26 @@ class Population(Snake):
         keep_best: bool,
         output_size: int,
         max_move_cycle: int,
+        network_dimensions: list,
     ):
 
         self.population_size = population_size
         self.selection_proportion = selection_proportion
+        self.keep_best = keep_best
+        self.output_size = output_size
+        self.mutation_rate = mutation_rate
+        self.max_move_cycle = max_move_cycle
+        self.network_dimensions = network_dimensions
+
+        self.Best_score = 0
+
         self.population = None
         self.BestSolution = None
-        self.Best_score = 0
         self.num_matrix_params = None
         self.num_idx_to_mutate = None
-
         self.parents_set = None
         self.idx_of_best = None
         self.population_scores = None
-        self.keep_best = keep_best
-        self.output_size = output_size
-
-        self.mutation_rate = mutation_rate
-        self.max_move_cycle = max_move_cycle
 
     def initialise_population(self):
         self.population = [
@@ -48,6 +50,7 @@ class Population(Snake):
                 max_move_cycle=self.max_move_cycle,
                 cheat=False,
                 display_freq=0,
+                network_dimensions=self.network_dimensions,
             )
             for i in range(self.population_size)
         ]
@@ -117,6 +120,12 @@ class Population(Snake):
         self.parents_set = population_as_array[self.idx_of_best]
 
     def recombine_from_parents(self, parent1, parent2):
+        """
+        Create two children from each pair of parents. Child 1 inherits more weights from parent 1, Child 2 get's more from parent 2.
+        TODO
+        - Create children from vertical slices of weight matrices from each parent, rather than taking whole layers. 
+        - 
+        """
 
         # initialise child1
         child1 = Snake(
@@ -130,6 +139,7 @@ class Population(Snake):
             max_move_cycle=self.max_move_cycle,
             cheat=False,
             display_freq=0,
+            network_dimensions=self.network_dimensions
         )
 
         # initialise child2
@@ -144,6 +154,7 @@ class Population(Snake):
             max_move_cycle=self.max_move_cycle,
             cheat=False,
             display_freq=0,
+            network_dimensions=self.network_dimensions
         )
 
         child1.W1 = parent1.W1
@@ -157,6 +168,12 @@ class Population(Snake):
         # print("child objects:", child1, child2)
 
         return child1, child2
+
+    def alternative_mutate(self):
+        for i in range(len(self.layers)):
+            self.layers[i] += np.random.normal(0, self.mutation_rate, self.layers[i].shape)
+            if self.use_bias:
+                self.biases[i] += np.random.normal(0, self.mutation_rate, self.biases[i].shape)
 
     def mutate(self, child):
 

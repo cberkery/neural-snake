@@ -3,7 +3,17 @@ import numpy as np
 
 
 class Snake_game(Snake_computation):
-    def __init__(self, game_size, l1_size, l2_size, n_food, input_type, max_snake_coords_input_size, output_size):
+    def __init__(
+        self,
+        game_size,
+        l1_size,
+        l2_size,
+        n_food,
+        input_type,
+        max_snake_coords_input_size,
+        output_size,
+        network_dimensions,
+    ):
 
         super().__init__(
             game_size,
@@ -13,6 +23,7 @@ class Snake_game(Snake_computation):
             input_type,
             max_snake_coords_input_size,
             output_size,
+            network_dimensions,
         )
         # self.n_food = n_food
         self.game_size = game_size
@@ -51,6 +62,7 @@ class Snake_game(Snake_computation):
                 # print("Game went on for too many iterations")
 
             if self.is_final_snake is True:
+                self.log_and_return_images()
                 if self.game_over is False:
                     self.display()
 

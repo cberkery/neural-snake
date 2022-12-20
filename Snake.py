@@ -16,6 +16,7 @@ class Snake(Snake_game):
         display_freq: bool,
         output_size: int,
         max_move_cycle: int,
+        network_dimensions: list,
     ):
         super().__init__(
             game_size,
@@ -25,7 +26,7 @@ class Snake(Snake_game):
             input_type,
             max_snake_coords_input_size,
             output_size,
-            # max_move_cycle
+            network_dimensions,
         )
 
         # self.x1 = int(self.game_size / 2)
@@ -92,12 +93,12 @@ class Snake(Snake_game):
 
         self.get_vector()
         self.move = self.compute()
-        
+
         self.move_counter += 1
 
         # Check if snake is going around in circles burning silicon
         if self.move_counter % 5 == 0:
-            #print('Checking cyclical behaviour move: {}'.format(self.move_counter))
+            # print('Checking cyclical behaviour move: {}'.format(self.move_counter))
             self.check_and_correct_cyclical_behaviour()
 
         self.moves.append(self.move)
@@ -198,9 +199,25 @@ class Snake(Snake_game):
         if np.all(np.array(self.moves[-self.max_move_cycle :]) == self.move) == True:
             possible_moves.remove(self.move)
             chose_other_move = np.random.choice(possible_moves)
-            #print('Snake was choosing same move every time, changing from {} to {}'.format(self.move, chose_other_move))
+            # print('Snake was choosing same move every time, changing from {} to {}'.format(self.move, chose_other_move))
 
             self.move = chose_other_move
+
+    def log_and_return_images(self):
+        if self.move_counter == 1:
+            self.images = []
+
+        display = np.zeros(self.game_size, self.game_size)
+        snake_arr = self.snake_List.copy()
+
+        for snack in self.food:
+            display[snack[0]][snack[1]] = "1"
+
+        # if len(snake_arr) > 1:
+        for coords in list(snake_arr):
+            display[coords[0]][coords[1]] = "0.5"
+
+        self.images.append(display)
 
     # def heuristics(self):
 
