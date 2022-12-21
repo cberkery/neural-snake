@@ -3,6 +3,12 @@ from Population import Population
 import numpy as np
 from Visualise import visualise
 
+from CLargs import CLargs
+from Population import Population
+from Snake import Snake
+
+population_size, iterations, mutation_rate, selection_proportion = CLargs().return_args()
+
 
 def run(iterations):
     """

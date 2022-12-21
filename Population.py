@@ -144,12 +144,17 @@ class Population(Snake):
             mutation_rate=self.mutation_rate
         ) for i in range(2)]
 
-        for child in children:
-            child.initialse_weights_and_biases()
-            genes = np.random.choice([parent1, parent2], len(child.layers) + len(child.biases))
-            for i in range(len(child.layers)):
-                child.layers[i] = genes[i].layers[i]
-                child.biases[i] = genes[i].biases[i]
+        # initialise child2
+        child2 = Snake(
+            game_size=20,
+            l1_size=30,
+            l2_size=30,
+            n_food=2,
+            input_type="simple",
+            max_snake_coords_input_size=10,
+            cheat=False,
+            display_freq=0,
+        )
 
         return children
 

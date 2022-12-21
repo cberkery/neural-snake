@@ -1,5 +1,6 @@
-from Snake_computation import Snake_computation
 import numpy as np
+
+from Snake_computation import Snake_computation
 
 
 class Snake_game(Snake_computation):

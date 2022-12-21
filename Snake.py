@@ -92,8 +92,7 @@ class Snake(Snake_game):
     def choose_move(self):
 
         self.get_vector()
-        #self.move = self.compute()
-        self.move = self.predict_choice(X=self.input_vec)
+            move = self.compute()
 
         self.move_counter += 1
 
