@@ -5,6 +5,7 @@ import numpy as np
 class Snake_game(Snake_computation):
     def __init__(
         self,
+       # *args,
         game_size,
         l1_size,
         l2_size,
@@ -19,13 +20,16 @@ class Snake_game(Snake_computation):
             game_size,
             l1_size,
             l2_size,
-            # n_food,
             input_type,
             max_snake_coords_input_size,
             output_size,
             network_dimensions,
+            # layers,
+            # biases
+
+            #*args, **kwargs
         )
-        # self.n_food = n_food
+        
         self.game_size = game_size
 
     def gameLoop(self):
@@ -37,13 +41,13 @@ class Snake_game(Snake_computation):
 
         self.assign_vector_creation_type()
         self.create_food()
-        self.initialise_weights()
+        self.initialse_weights_and_biases()
 
         while self.game_over is not True:
 
             # self.create_food()
-            if self.is_final_snake is True:
-                print("final snake move count", self.move_counter)
+            # if self.is_final_snake is True:
+            #     print("final snake move count", self.move_counter)
 
             self.choose_move()
 
@@ -57,14 +61,14 @@ class Snake_game(Snake_computation):
 
             self.grow_or_shift()
 
-            if self.move_counter > 800:
+            if self.move_counter > 80:
                 self.game_over = True
                 # print("Game went on for too many iterations")
 
             if self.is_final_snake is True:
                 self.log_and_return_images()
-                if self.game_over is False:
-                    self.display()
+                # if self.game_over is False:
+                #     self.display()
 
         return self.Length_of_snake
 

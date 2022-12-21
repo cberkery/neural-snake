@@ -18,5 +18,5 @@ def visualise(imagelist):
         return [im]
     # kick off the animation
     ani = animation.FuncAnimation(fig, updatefig, frames=len(imagelist), 
-                                interval=100, blit=True)
-    plt.show()
+                                interval=60, blit=True)
+    plt.show(block=True)

@@ -17,6 +17,7 @@ class Population(Snake):
         output_size: int,
         max_move_cycle: int,
         network_dimensions: list,
+        
     ):
 
         self.population_size = population_size
@@ -26,6 +27,7 @@ class Population(Snake):
         self.mutation_rate = mutation_rate
         self.max_move_cycle = max_move_cycle
         self.network_dimensions = network_dimensions
+
 
         self.Best_score = 0
 
@@ -37,13 +39,14 @@ class Population(Snake):
         self.idx_of_best = None
         self.population_scores = None
 
+
     def initialise_population(self):
         self.population = [
             Snake(
                 game_size=20,
                 l1_size=30,
                 l2_size=30,
-                n_food=2,
+                n_food=4,
                 input_type="simple",
                 max_snake_coords_input_size=10,
                 output_size=self.output_size,
@@ -51,6 +54,7 @@ class Population(Snake):
                 cheat=False,
                 display_freq=0,
                 network_dimensions=self.network_dimensions,
+                mutation_rate=self.mutation_rate
             )
             for i in range(self.population_size)
         ]
@@ -68,13 +72,12 @@ class Population(Snake):
     def selection_loop(self):
         self.run_and_get_idx_of_best()
         self.get_parents()
-        if self.num_idx_to_mutate is None:
-            self.get_num_idx_to_mutate()
+        # if self.num_idx_to_mutate is None:
+        #     self.get_num_idx_to_mutate()
         self.create_new_population()
 
     def run_and_get_idx_of_best(self):
         self.population_scores = [snake.gameLoop() for snake in self.population]
-        # print('population scores', self.population_scores)
         if len(np.argsort(np.array(self.population_scores))[::-1]) > 1:
             self.idx_of_best = np.argsort(np.array(self.population_scores))[::-1][
                 : int(self.selection_proportion * self.population_size)
@@ -85,8 +88,7 @@ class Population(Snake):
                 self.BestSolution = self.population[self.idx_of_best[0]]
                 self.Best_score = self.population_scores[self.idx_of_best[0]]
                 self.print_move_dist_best_solution()
-                # unique, counts = np.unique(self.BestSolution.move_list, return_counts=True)
-                # print('Unique moves', unique, 'Move frequencies: ', counts)
+                
         else:
             self.idx_of_best = [i for i in range(10)]
 
@@ -97,7 +99,7 @@ class Population(Snake):
             best = self.population[self.idx_of_best[0]]
             best = self.inherit_weights_from_best_sol()
             mutated_best = deepcopy(best)
-            self.mutate(mutated_best)
+            mutated_best.mutate()
 
             new_population.append(best)  # Ensure best organism survives unmutated + a mutated one
             new_population.append(mutated_best)
@@ -105,9 +107,10 @@ class Population(Snake):
         while len(new_population) < self.population_size:
             parents = np.random.choice(self.parents_set, size=2, replace=True)
             parent1, parent2 = parents[0], parents[1]
-            child1, child2 = self.recombine_from_parents(parent1, parent2)
-            self.mutate(child1)
-            self.mutate(child2)
+            children = self.recombine_from_parents(parent1, parent2)
+            child1, child2 = children[0], children[1]
+            child1.mutate()
+            child1.mutate()
             new_population.append(child1)
             new_population.append(child2)
 
@@ -126,103 +129,83 @@ class Population(Snake):
         - Create children from vertical slices of weight matrices from each parent, rather than taking whole layers. 
         - 
         """
-
-        # initialise child1
-        child1 = Snake(
+        children = [Snake(
             game_size=20,
             l1_size=30,
             l2_size=30,
-            n_food=2,
+            n_food=4,
             input_type="simple",
             max_snake_coords_input_size=10,
             output_size=self.output_size,
             max_move_cycle=self.max_move_cycle,
             cheat=False,
             display_freq=0,
-            network_dimensions=self.network_dimensions
-        )
+            network_dimensions=self.network_dimensions,
+            mutation_rate=self.mutation_rate
+        ) for i in range(2)]
 
-        # initialise child2
-        child2 = Snake(
-            game_size=20,
-            l1_size=30,
-            l2_size=30,
-            n_food=2,
-            input_type="simple",
-            max_snake_coords_input_size=10,
-            output_size=self.output_size,
-            max_move_cycle=self.max_move_cycle,
-            cheat=False,
-            display_freq=0,
-            network_dimensions=self.network_dimensions
-        )
+        for child in children:
+            child.initialse_weights_and_biases()
+            genes = np.random.choice([parent1, parent2], len(child.layers) + len(child.biases))
+            for i in range(len(child.layers)):
+                child.layers[i] = genes[i].layers[i]
+                child.biases[i] = genes[i].biases[i]
 
-        child1.W1 = parent1.W1
-        child1.W2 = parent1.W2
-        child1.W3 = parent2.W3
+        return children
 
-        child2.W1 = parent2.W1
-        child2.W2 = parent2.W2
-        child2.W3 = parent1.W3
+    
 
-        # print("child objects:", child1, child2)
+    # def mutate(self, child):
 
-        return child1, child2
+    #     flat_weights = np.concatenate((child.W1.flatten(), child.W2.flatten(), child.W3.flatten()))
+    #     # print("Len flat weights:", len(flat_weights))
+    #     mutation_idx = np.random.randint(len(flat_weights), size=self.num_idx_to_mutate)
+    #     flat_weights[mutation_idx] = np.random.uniform(low=-1, high=1.0, size=len(mutation_idx))
 
-    def alternative_mutate(self):
-        for i in range(len(self.layers)):
-            self.layers[i] += np.random.normal(0, self.mutation_rate, self.layers[i].shape)
-            if self.use_bias:
-                self.biases[i] += np.random.normal(0, self.mutation_rate, self.biases[i].shape)
+    #     w1_slice = child.W1.shape[0] * child.W1.shape[1]
+    #     w2_slice = w1_slice + (child.W2.shape[0] * child.W2.shape[1])
 
-    def mutate(self, child):
+    #     # print("Size w1", child.W1.shape, "total_entries:", len(child.W1.flatten()))
+    #     # print("Size w2", child.W2.shape, "total_entries:", len(child.W2.flatten()))
+    #     # print("Size w3", child.W3.shape, "total_entries:", len(child.W3.flatten()))
 
-        flat_weights = np.concatenate((child.W1.flatten(), child.W2.flatten(), child.W3.flatten()))
-        # print("Len flat weights:", len(flat_weights))
-        mutation_idx = np.random.randint(len(flat_weights), size=self.num_idx_to_mutate)
-        flat_weights[mutation_idx] = np.random.uniform(low=-1, high=1.0, size=len(mutation_idx))
+    #     w1 = flat_weights[:w1_slice]
+    #     w2 = flat_weights[w1_slice:w2_slice]
+    #     w3 = flat_weights[w2_slice:]
 
-        w1_slice = child.W1.shape[0] * child.W1.shape[1]
-        w2_slice = w1_slice + (child.W2.shape[0] * child.W2.shape[1])
+    #     # print("Length after flattening w1: ", len(w1))
+    #     # print("Length after flattening w2: ", len(w2))
+    #     # print("Length after flattening w3: ", len(w3))
 
-        # print("Size w1", child.W1.shape, "total_entries:", len(child.W1.flatten()))
-        # print("Size w2", child.W2.shape, "total_entries:", len(child.W2.flatten()))
-        # print("Size w3", child.W3.shape, "total_entries:", len(child.W3.flatten()))
+    #     w1 = w1.reshape(child.W1.shape[0], child.W1.shape[1])
+    #     w2 = w2.reshape(child.W2.shape[0], child.W2.shape[1])
+    #     w3 = w3.reshape(child.W3.shape[0], child.W3.shape[1])
 
-        w1 = flat_weights[:w1_slice]
-        w2 = flat_weights[w1_slice:w2_slice]
-        w3 = flat_weights[w2_slice:]
-
-        # print("Length after flattening w1: ", len(w1))
-        # print("Length after flattening w2: ", len(w2))
-        # print("Length after flattening w3: ", len(w3))
-
-        w1 = w1.reshape(child.W1.shape[0], child.W1.shape[1])
-        w2 = w2.reshape(child.W2.shape[0], child.W2.shape[1])
-        w3 = w3.reshape(child.W3.shape[0], child.W3.shape[1])
-
-        child.W1 = w1
-        child.W2 = w2
-        child.W3 = w3
+    #     child.W1 = w1
+    #     child.W2 = w2
+    #     child.W3 = w3
 
     def inherit_weights_from_best_sol(self):
-
+        """
+        Instead of using the same BestSolution object and manually resetting every changing attribute for the next selection round.
+        """
         new_snake = Snake(
             game_size=20,
             l1_size=30,
             l2_size=30,
-            n_food=2,
+            n_food=4,
             input_type="simple",
             max_snake_coords_input_size=10,
             output_size=self.output_size,
             max_move_cycle=self.max_move_cycle,
             cheat=False,
             display_freq=0,
+            network_dimensions=self.network_dimensions,
+            mutation_rate=self.mutation_rate
         )
 
-        new_snake.W1 = self.BestSolution.W1.copy()
-        new_snake.W2 = self.BestSolution.W2.copy()
-        new_snake.W3 = self.BestSolution.W3.copy()
+        new_snake.layers = self.BestSolution.layers.copy()
+        new_snake.biases = self.BestSolution.biases.copy()
 
         return new_snake
 

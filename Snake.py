@@ -6,6 +6,7 @@ from Snake_game import Snake_game
 class Snake(Snake_game):
     def __init__(
         self,
+        #*args,
         game_size,
         l1_size,
         l2_size,
@@ -17,6 +18,7 @@ class Snake(Snake_game):
         output_size: int,
         max_move_cycle: int,
         network_dimensions: list,
+        mutation_rate: float
     ):
         super().__init__(
             game_size,
@@ -27,10 +29,11 @@ class Snake(Snake_game):
             max_snake_coords_input_size,
             output_size,
             network_dimensions,
+            # layers,
+            # biases
+            #*args, **kwargs
+        
         )
-
-        # self.x1 = int(self.game_size / 2)
-        # self.y1 = int(self.game_size / 2)
 
         self.location = np.array([int(self.game_size / 2), int(self.game_size / 2)])
         self.direction = np.array([1, 0])
@@ -39,13 +42,10 @@ class Snake(Snake_game):
 
         self.n_food = n_food
         self.food = np.random.randint(1, self.game_size - 1, size=(n_food, 2))
+        self.mutation_rate =  mutation_rate
 
         self.snake_List = self.location
         self.Length_of_snake = 1
-
-        ## Check where this is used and replace!!
-        # self.last_move_x = [0]
-        # self.last_move_y = [0]
 
         self.move_counter = 0
         self.matrix_coords_of_snake_and_food = np.vstack((self.snake_List.copy(), self.food))
@@ -92,14 +92,15 @@ class Snake(Snake_game):
     def choose_move(self):
 
         self.get_vector()
-        self.move = self.compute()
+        #self.move = self.compute()
+        self.move = self.predict_choice(X=self.input_vec)
 
         self.move_counter += 1
 
         # Check if snake is going around in circles burning silicon
-        if self.move_counter % 5 == 0:
-            # print('Checking cyclical behaviour move: {}'.format(self.move_counter))
-            self.check_and_correct_cyclical_behaviour()
+        # if self.move_counter % 5 == 0:
+        #     # print('Checking cyclical behaviour move: {}'.format(self.move_counter))
+        #     self.check_and_correct_cyclical_behaviour()
 
         self.moves.append(self.move)
 
@@ -118,9 +119,14 @@ class Snake(Snake_game):
             self.move_dist["right"] += 1
 
         # CONTINUE
-        elif move == 4:
-            y1_change = self.last_move_y[-1]
-            x1_change = self.last_move_x[-1]
+        elif self.move == 2:
+            self.move_dist["continue"] += 1
+
+    def mutate(self):
+        for i in range(len(self.layers)):
+            self.layers[i] += np.random.normal(0, self.mutation_rate, self.layers[i].shape)
+            if self.use_bias:
+                self.biases[i] += np.random.normal(0, self.mutation_rate, self.biases[i].shape)
 
     @jit(forceobj=True)
     def right_rotation(self):
@@ -208,15 +214,15 @@ class Snake(Snake_game):
         if self.move_counter == 1:
             self.images = []
 
-        display = np.zeros(self.game_size, self.game_size)
+        display = np.zeros((self.game_size+1, self.game_size+1))
         snake_arr = self.snake_List.copy()
 
         for snack in self.food:
-            display[snack[0]][snack[1]] = "1"
+            display[snack[0]][snack[1]] = "255"
 
         # if len(snake_arr) > 1:
         for coords in list(snake_arr):
-            display[coords[0]][coords[1]] = "0.5"
+            display[coords[0]][coords[1]] = "35"
 
         self.images.append(display)
 
